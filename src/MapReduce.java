@@ -61,111 +61,57 @@ public class MapReduce {
 
 
         // APPROACH #1: Brute force
-        {
-            // create a map containing String and another map.
-            // inner map contains a String and in
-            //
-            // MAP ( String, MAP(String, int) )
-            //
-            Map<String, Map<String, Integer>> output = new HashMap<String, Map<String, Integer>>();
-
-            Iterator<Map.Entry<String, String>> inputIter = input.entrySet().iterator();
-            // while the input contains another entry
-            // (should contain 3 entries -- one for each file)
-            while(inputIter.hasNext()) {
-                // get the file name and the string containing all words
-                Map.Entry<String, String> entry = inputIter.next();
-                // get the key (filename)
-                String file = entry.getKey();
-                // get the value (words)
-                String contents = entry.getValue();
-                // split the string containing the words into an
-                // array of words
-                String[] words = contents.trim().split("\\s+");
-
-                // LOOP THROUGH EACH WORD FOR A GIVEN FILE
-                for(String word : words) {
-                    // files = {file1.txt=1,
-                    // get the file and number of occurrences for a given word
-                    Map<String, Integer> files = output.get(word);
-                    // one FIRST iteration, the output map will NOT contain any entries
-                    // ==> file will be null
-                    if (files == null) {
-                        // create map to assign it as the value of the output map
-                        files = new HashMap<String, Integer>();
-                        // this map consists of the of the word, and a map of files and occurrences
-                        output.put(word, files);
-                    }
-                    // remove the file name from the map of file names and occurrences
-                    Integer occurrences = files.remove(file);
-                    if (occurrences == null) {
-                        // put the name of the file and the number of occurrences into the files map
-                        files.put(file, 1);
-                    } else {
-                        // put the name of the file and the number of occurrences into the files map
-                        files.put(file, occurrences.intValue() + 1);
-                    }
-                }
-            }
-
-            // show me:
+//        {
+//            // create a map containing String and another map.
+//            // inner map contains a String and in
+//            //
+//            // MAP ( String, MAP(String, int) )
+//            //
+//            Map<String, Map<String, Integer>> output = new HashMap<String, Map<String, Integer>>();
+//
+//            Iterator<Map.Entry<String, String>> inputIter = input.entrySet().iterator();
+//            // while the input contains another entry
+//            // (should contain 3 entries -- one for each file)
+//            while(inputIter.hasNext()) {
+//                // get the file name and the string containing all words
+//                Map.Entry<String, String> entry = inputIter.next();
+//                // get the key (filename)
+//                String file = entry.getKey();
+//                // get the value (words)
+//                String contents = entry.getValue();
+//                // split the string containing the words into an
+//                // array of words
+//                String[] words = contents.trim().split("\\s+");
+//
+//                // LOOP THROUGH EACH WORD FOR A GIVEN FILE
+//                for(String word : words) {
+//                    // files = {file1.txt=1,
+//                    // get the file and number of occurrences for a given word
+//                    Map<String, Integer> files = output.get(word);
+//                    // one FIRST iteration, the output map will NOT contain any entries
+//                    // ==> file will be null
+//                    if (files == null) {
+//                        // create map to assign it as the value of the output map
+//                        files = new HashMap<String, Integer>();
+//                        // this map consists of the of the word, and a map of files and occurrences
+//                        output.put(word, files);
+//                    }
+//                    // remove the file name from the map of file names and occurrences
+//                    Integer occurrences = files.remove(file);
+//                    if (occurrences == null) {
+//                        // put the name of the file and the number of occurrences into the files map
+//                        files.put(file, 1);
+//                    } else {
+//                        // put the name of the file and the number of occurrences into the files map
+//                        files.put(file, occurrences.intValue() + 1);
+//                    }
+//                }
+//            }
+//
+//            // show me:
 //            System.out.println("\nApproach 1:");
 //            System.out.println(output);
-        }
-
-        // APPROACH #1: Brute force
-        {
-            // create a map containing String and another map.
-            // inner map contains a String and in
-            //
-            // MAP ( String, MAP(String, int) )
-            //
-            Map<String, Map<String, Integer>> output = new HashMap<String, Map<String, Integer>>();
-
-            Iterator<Map.Entry<String, String>> inputIter = input.entrySet().iterator();
-            // while the input contains another entry
-            // (should contain 3 entries -- one for each file)
-            while(inputIter.hasNext()) {
-                // get the file name and the string containing all words
-                Map.Entry<String, String> entry = inputIter.next();
-                // get the key (filename)
-                String file = entry.getKey();
-                // get the value (words)
-                String contents = entry.getValue();
-                // split the string containing the words into an
-                // array of words
-                String[] words = contents.trim().split("\\s+");
-
-                // LOOP THROUGH EACH WORD FOR A GIVEN FILE
-                for(String word : words) {
-                    // files = {file1.txt=1,
-                    // get the file and number of occurrences for a given word
-                    Map<String, Integer> files = output.get(word);
-                    // one FIRST iteration, the output map will NOT contain any entries
-                    // ==> file will be null
-                    if (files == null) {
-                        // create map to assign it as the value of the output map
-                        files = new HashMap<String, Integer>();
-                        // this map consists of the of the word, and a map of files and occurrences
-                        output.put(word, files);
-                    }
-                    // remove the file name from the map of file names and occurrences
-                    Integer occurrences = files.remove(file);
-                    if (occurrences == null) {
-                        // put the name of the file and the number of occurrences into the files map
-                        files.put(file, 1);
-                    } else {
-                        // put the name of the file and the number of occurrences into the files map
-                        files.put(file, occurrences.intValue() + 1);
-                    }
-                }
-            }
-
-            // show me:
-//            System.out.println("\nApproach 1:");
-//            System.out.println(output);
-        }
-
+//        }
 //
 //        // APPROACH #2: MapReduce
 //        {
@@ -216,9 +162,7 @@ public class MapReduce {
 //            System.out.println(output);
 //        }
 
-
-        // APPROACH #3: Distributed MapReduce
-        {
+        {   // APPROACH #3: Distributed MapReduce
             final Map<String, Map<String, Integer>> output = new HashMap<String, Map<String, Integer>>();
 
             // MAP:
@@ -249,16 +193,15 @@ public class MapReduce {
                 mapPool.execute(t);
             }
             //Ensures all threads complete
+
+            // TIME THE MAP PHASE
             mapPool.shutdown();
             long startTime = System.nanoTime();
             //Not sure if this is good practice
             while (!mapPool.isTerminated()) {}
-            long time = System.nanoTime() - startTime;
-
-            System.out.println("Finished all map threads in " + time + "ns");
+            long mapTime = System.nanoTime() - startTime;
 
             // GROUP:
-
             Map<String, List<String>> groupedItems = new HashMap<String, List<String>>();
 
             Iterator<MappedItem> mappedIter = mappedItems.iterator();
@@ -301,19 +244,21 @@ public class MapReduce {
 
             //Ensures all threads complete
             reducePool.shutdown();
-            long startTimeReduce = System.nanoTime();
+
+            // TIME THE REDUCE PHASE
+            long startReduceTime = System.nanoTime();
             //Not sure if this is good practice
             while (!reducePool.isTerminated()) {}
-            long timeReduce = System.nanoTime() - startTimeReduce;
-
-            System.out.println("Finished all reduce threads in " + timeReduce + "ns");
+            long reduceTime = System.nanoTime() - startReduceTime;
 
             System.out.println("\nApproach 3:");
-            System.out.println(output);
-        }
+            System.out.println("Finished all map threads in " + mapTime + "ns");
+            System.out.println("Finished all reduce threads in " + reduceTime + "ns\n");
+            //System.out.println(output);
+        } // END APPROACH #3
 
-        // APPROACH #4: Distributed MapReduce with Concurrent Data Structures
-        {
+
+        {   // APPROACH #4: Distributed MapReduce with Concurrent Data Structures
             final Map<String, Map<String, Integer>> output = new HashMap<String, Map<String, Integer>>();
 
             // MAP:
@@ -344,16 +289,15 @@ public class MapReduce {
                 mapPool.execute(t);
             }
             //Ensures all threads complete
+
+            // TIME THE MAP PHASE
             mapPool.shutdown();
             long startTime = System.nanoTime();
             //Not sure if this is good practice
             while (!mapPool.isTerminated()) {}
-            long time = System.nanoTime() - startTime;
-
-            System.out.println("Finished all map threads in " + time + "ns");
+            long mapTime = System.nanoTime() - startTime;
 
             // GROUP:
-
             Map<String, List<String>> groupedItems = new HashMap<String, List<String>>();
 
             Iterator<MappedItem> mappedIter = mappedItems.iterator();
@@ -396,23 +340,35 @@ public class MapReduce {
 
             //Ensures all threads complete
             reducePool.shutdown();
-            long startTimeReduce = System.nanoTime();
+
+            // TIME THE REDUCE PHASE
+            long startReduceTime = System.nanoTime();
             //Not sure if this is good practice
             while (!reducePool.isTerminated()) {}
-            long timeReduce = System.nanoTime() - startTimeReduce;
+            long reduceTime = System.nanoTime() - startReduceTime;
 
-            System.out.println("Finished all reduce threads in " + timeReduce + "ns");
-
-            System.out.println("\nApproach 3:");
-            System.out.println(output);
-        }
+            System.out.println("\nApproach 4:");
+            System.out.println("Finished all map threads in " + mapTime + "ns");
+            System.out.println("Finished all reduce threads in " + reduceTime + "ns\n");
+            //System.out.println(output);
+        } // END APPROACH #4
     }
+
 
     public static void map(String file, String contents, List<MappedItem> mappedItems) {
         String[] words = contents.trim().split("\\s+");
         for(String word: words) {
             mappedItems.add(new MappedItem(word, file));
         }
+    }
+
+    public static void map(String file, String contents, MapCallback<String, MappedItem> callback) {
+        String[] words = contents.trim().split("\\s+");
+        List<MappedItem> results = new ArrayList<MappedItem>(words.length);
+        for(String word: words) {
+            results.add(new MappedItem(word, file));
+        }
+        callback.mapDone(file, results);
     }
 
     public static void reduce(String word, List<String> list, Map<String, Map<String, Integer>> output) {
@@ -428,25 +384,6 @@ public class MapReduce {
         output.put(word, reducedList);
     }
 
-    public static interface MapCallback<E, V> {
-
-        public void mapDone(E key, List<V> values);
-    }
-
-    public static void map(String file, String contents, MapCallback<String, MappedItem> callback) {
-        String[] words = contents.trim().split("\\s+");
-        List<MappedItem> results = new ArrayList<MappedItem>(words.length);
-        for(String word: words) {
-            results.add(new MappedItem(word, file));
-        }
-        callback.mapDone(file, results);
-    }
-
-    public static interface ReduceCallback<E, K, V> {
-
-        public void reduceDone(E e, Map<K,V> results);
-    }
-
     public static void reduce(String word, List<String> list, ReduceCallback<String, String, Integer> callback) {
 
         Map<String, Integer> reducedList = new HashMap<String, Integer>();
@@ -459,6 +396,16 @@ public class MapReduce {
             }
         }
         callback.reduceDone(word, reducedList);
+    }
+
+    public static interface MapCallback<E, V> {
+
+        public void mapDone(E key, List<V> values);
+    }
+
+    public static interface ReduceCallback<E, K, V> {
+
+        public void reduceDone(E e, Map<K,V> results);
     }
 
     private static class MappedItem {
