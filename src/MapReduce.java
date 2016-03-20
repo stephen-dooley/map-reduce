@@ -5,6 +5,7 @@
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.PrintWriter;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -17,9 +18,8 @@ public class MapReduce {
 
         // get number of files to be reduced from the user
         Scanner reader = new Scanner(System.in);
-        //System.out.println("Enter the number of files in database:");
-        //int poolSize = reader.nextInt();
-        int poolSize = 3;
+        System.out.println("Enter the number of files in database:");
+        int poolSize = reader.nextInt();
 
         //PART 1
         // create an input with the name of a file and a String
@@ -76,12 +76,12 @@ public class MapReduce {
             };
 
             Iterator<Map.Entry<String, String>> inputIter = input.entrySet().iterator();
+            //Creating a thread pool (of size defined by how many files being map-reduced)
             ExecutorService mapPool3 = Executors.newFixedThreadPool(poolSize);
             while(inputIter.hasNext()) {
                 Map.Entry<String, String> entry = inputIter.next();
                 final String file = entry.getKey();
                 final String contents = entry.getValue();
-
                 Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -91,14 +91,12 @@ public class MapReduce {
                 //Adding thread to threadpool
                 mapPool3.execute(t);
             }
-            //Ensures all threads complete
-
-            // TIME THE MAP PHASE
             mapPool3.shutdown();
-            long startTime = System.nanoTime();
-            //Not sure if this is good practice
+            // TIME THE MAP PHASE
+            long startTime = System.currentTimeMillis();
+            //Ensures all threads complete
             while (!mapPool3.isTerminated()) {}
-            long mapTime = System.nanoTime() - startTime;
+            long mapTime = System.currentTimeMillis() - startTime;
 
             // GROUP:
             Map<String, List<String>> groupedItems = new HashMap<String, List<String>>();
@@ -126,6 +124,7 @@ public class MapReduce {
             };
 
             Iterator<Map.Entry<String, List<String>>> groupedIter = groupedItems.entrySet().iterator();
+            //Establishing reduce phase thread pool
             ExecutorService reducePool3 = Executors.newFixedThreadPool(poolSize);
             while(groupedIter.hasNext()) {
                 Map.Entry<String, List<String>> entry = groupedIter.next();
@@ -138,22 +137,27 @@ public class MapReduce {
                         reduce(word, list, reduceCallback);
                     }
                 });
+                //adding thread to reduce pool
                 reducePool3.execute(t);
             }
-
-            //Ensures all threads complete
             reducePool3.shutdown();
 
             // TIME THE REDUCE PHASE
-            long startReduceTime = System.nanoTime();
-            //Not sure if this is good practice
+            long startReduceTime = System.currentTimeMillis();
+            //Ensures all threads complete
             while (!reducePool3.isTerminated()) {}
-            long reduceTime = System.nanoTime() - startReduceTime;
+            long reduceTime = System.currentTimeMillis() - startReduceTime;
 
             System.out.println("\nApproach 3:");
-            System.out.println("Finished all map threads in " + mapTime + "ns");
-            System.out.println("Finished all reduce threads in " + reduceTime + "ns\n");
+            System.out.println("Finished all map threads in " + mapTime + "ms");
+            System.out.println("Finished all reduce threads in " + reduceTime + "ms\n");
             System.out.println(output);
+            // Printing output to file
+            try {
+                PrintWriter out = new PrintWriter("outputApproach3.txt");
+                out.println(output);
+            }
+            catch (Exception e) {}
         } // END APPROACH #3
 
 
@@ -164,14 +168,8 @@ public class MapReduce {
 
             final CopyOnWriteArrayList<MappedItem> mappedItems = new CopyOnWriteArrayList<MappedItem>();
 
-//            final MapCallback<String, MappedItem> mapCallback = new MapCallback<String, MappedItem>() {
-//                @Override
-//                public synchronized void mapDone(String file, CopyOnWriteArrayList<MappedItem> results) {
-//                    mappedItems.addAll(results);
-//                }
-//            };
-
             Iterator<ConcurrentHashMap.Entry<String, String>> inputIter = input.entrySet().iterator();
+            //Establishing thread pool for map threads
             ExecutorService mapPool4 = Executors.newFixedThreadPool(poolSize);
             while(inputIter.hasNext()) {
                 ConcurrentHashMap.Entry<String, String> entry = inputIter.next();
@@ -187,14 +185,12 @@ public class MapReduce {
                 //Adding thread to threadpool
                 mapPool4.execute(t);
             }
-            //Ensures all threads complete
-
-            // TIME THE MAP PHASE
             mapPool4.shutdown();
-            long startTime = System.nanoTime();
-            //Not sure if this is good practice
+            // TIME THE MAP PHASE
+            long startTime = System.currentTimeMillis();
+            //Ensures all threads complete
             while (!mapPool4.isTerminated()) {}
-            long mapTime = System.nanoTime() - startTime;
+            long mapTime = System.currentTimeMillis() - startTime;
 
             // GROUP:
             ConcurrentHashMap<String, CopyOnWriteArrayList<String>> groupedItems = new ConcurrentHashMap<String, CopyOnWriteArrayList<String>>();
@@ -212,16 +208,9 @@ public class MapReduce {
                 list.add(file);
             }
 
-            // REDUCE:
-
-//            final ReduceCallback<String, String, Integer> reduceCallback = new ReduceCallback<String, String, Integer>() {
-//                @Override
-//                public synchronized void reduceDone(String k, Map<String, Integer> v) {
-//                    output.put(k, v);
-//                }
-//            };
 
             Iterator<ConcurrentHashMap.Entry<String, CopyOnWriteArrayList<String>>> groupedIter = groupedItems.entrySet().iterator();
+            //Reduce thread pool creation
             ExecutorService reducePool4 = Executors.newFixedThreadPool(poolSize);
             while(groupedIter.hasNext()) {
                 ConcurrentHashMap.Entry<String, CopyOnWriteArrayList<String>> entry = groupedIter.next();
@@ -234,22 +223,26 @@ public class MapReduce {
                         reduce(word, list, output);
                     }
                 });
+                //addign to thread pool
                 reducePool4.execute(t);
             }
-
-            //Ensures all threads complete
             reducePool4.shutdown();
-
             // TIME THE REDUCE PHASE
-            long startReduceTime = System.nanoTime();
-            //Not sure if this is good practice
+            long startReduceTime = System.currentTimeMillis();
+            //Ensures all threads complete
             while (!reducePool4.isTerminated()) {}
-            long reduceTime = System.nanoTime() - startReduceTime;
+            long reduceTime = System.currentTimeMillis() - startReduceTime;
 
             System.out.println("\nApproach 4:");
-            System.out.println("Finished all map threads in " + mapTime + "ns");
-            System.out.println("Finished all reduce threads in " + reduceTime + "ns\n");
+            System.out.println("Finished all map threads in " + mapTime + "ms");
+            System.out.println("Finished all reduce threads in " + reduceTime + "ms\n");
             System.out.println(output);
+            //Printing output to file
+            try {
+                PrintWriter out = new PrintWriter("outputApproach4.txt");
+                out.println(output);
+            }
+            catch (Exception e) {}
         } // END APPROACH #4
     }
 
@@ -332,5 +325,4 @@ public class MapReduce {
         }
     }
 }
-
 
